@@ -7,11 +7,14 @@ from templates import (
     types_file_template,
     type_template,
     actions_file_template,
-    action_template
+    action_template,
+    reducer_case_template,
+    reducers_file_template
 )
 
 from utils import (
     convert_camel_case,
+    convert_reverse_camel_case,
     convert_const_case,
     create_folder,
     log_title,
@@ -32,6 +35,7 @@ for file_name in os.listdir(description_folder):
     with open(file_name) as file:
         types = ''
         actions = ''
+        cases = ''
         flow_types = []
         for row in file:
             splitted_row = row.strip().split(';')
@@ -44,15 +48,18 @@ for file_name in os.listdir(description_folder):
             else:
                 print "Error: row with bad format."
 
+            verb = verb.lower().strip()
             noun = noun.lower().strip().split()
 
-            perfect_past = conjugate(verb,
-                tense='past',
-                person=3,
-                number='singular',
-                mood='indicative',
-                aspect='progressive'
-            ).strip()
+            perfect_past = verb
+            if verb not in ['fetch']:
+                perfect_past = conjugate(verb,
+                    tense='past',
+                    person=3,
+                    number='singular',
+                    mood='indicative',
+                    aspect='progressive'
+                ).strip()
 
             imperative = conjugate(verb, 
                 tense='present',
@@ -67,7 +74,7 @@ for file_name in os.listdir(description_folder):
                 [perfect_past] +
                 modification)
             type_name = '{0}_TYPE'.format(type_value)
-            action_name = convert_camel_case(
+            action_name = convert_reverse_camel_case(
                 [imperative] +
                 noun +
                 modification)
@@ -80,8 +87,13 @@ for file_name in os.listdir(description_folder):
                 action_name=action_name,
                 type_name=type_name,
                 type_value=type_value)
+            cases += reducer_case_template.format(
+                type_value=type_value
+            )
 
     domain = get_filename(file.name)
+    upper_camel_domain = convert_camel_case([domain])
+    domain_state_type = '{0}State'.format(upper_camel_domain)
 
     print log("CREATED: {domain} types".format(domain=domain))
     create_folder('output/types')
@@ -93,7 +105,7 @@ for file_name in os.listdir(description_folder):
                 types=types,
                 or_type='\n  | '.join(flow_types)))
 
-        print log("CREATED: {domain} actions".format(domain=domain))
+    print log("CREATED: {domain} actions".format(domain=domain))
     create_folder('output/actions')
     actions_file_name = 'output/actions/{domain}.js'.format(domain=domain)
     with open(actions_file_name, 'w') as actions_file:
@@ -104,6 +116,18 @@ for file_name in os.listdir(description_folder):
                     '  {0}'.format(flow_type) for flow_type in flow_types
                 ]),
                 actions=actions
+            ))
+
+    print log("CREATED: {domain} reducers".format(domain=domain))
+    create_folder('output/reducers')
+    reducer_file_name = 'output/reducers/{domain}.js'.format(domain=domain)
+    with open(reducer_file_name, 'w') as reducers_file:
+        reducers_file.write(
+            reducers_file_template.format(
+                domain=domain,
+                main_type='{0}_ACTION_TYPE'.format(domain.upper()),
+                domain_state_type=domain_state_type,
+                cases=cases
             ))
 
     print log("SUCCES: {domain}".format(domain=domain), code='okblue')

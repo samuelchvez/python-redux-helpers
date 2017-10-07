@@ -6,10 +6,16 @@ def get_filename(path):
     return os.path.splitext(os.path.basename(path))[0]
 
 
-def convert_camel_case(string_list):
+def convert_reverse_camel_case(string_list):
     return ''.join([string_list[0]] + [
         part.capitalize()
         for part in string_list[1:]
+    ])
+
+def convert_camel_case(string_list):
+    return ''.join([
+        part.capitalize()
+        for part in string_list
     ])
 
 

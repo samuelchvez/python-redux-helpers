@@ -26,3 +26,30 @@ import type {{
 
 {actions}
 '''
+
+reducer_case_template = '''
+  case types.{type_value}: {{
+    return state;
+  }}
+''';
+
+reducers_file_template = '''//@flow
+import {{ combineReducers }} from 'redux';
+
+import * as types from '../types/{domain}';
+import type {{{main_type}}} from '../types/{domain}';
+
+export type {domain_state_type} = Object;
+
+const {domain} =  (
+  state: {domain_state_type} = {{}},
+  action: {main_type}): {domain_state_type} => {{
+  switch (action.type) {{
+    {cases}
+    default:
+      return state;
+  }}
+}}
+
+export default {domain};
+''';
