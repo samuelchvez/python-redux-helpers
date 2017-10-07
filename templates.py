@@ -15,6 +15,7 @@ action_template = '''export const {action_name} = (): {type_name} => ({{
   type: types.{type_value},
   payload: {{}}
 }});
+
 '''
 
 actions_file_template = '''// @flow

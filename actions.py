@@ -1,3 +1,4 @@
+import os
 import sys
 
 from pattern.en import conjugate
@@ -22,9 +23,10 @@ from utils import (
 
 print log_title("Redux types and actions generator")
 
-file_names = sys.argv[1:]
+description_folder = sys.argv[1]
 create_folder('output')
-for file_name in file_names:
+for file_name in os.listdir(description_folder):
+    file_name = os.path.join(description_folder, file_name)
     print log_subtitle("Processing {file_name}".format(
         file_name=file_name))
     with open(file_name) as file:
@@ -38,11 +40,11 @@ for file_name in file_names:
                 noun, verb = splitted_row
             elif len(splitted_row) == 3:
                 noun, verb, modification = splitted_row
-                modification = [modification]
+                modification = [modification.strip()]
             else:
                 print "Error: row with bad format."
 
-            noun = noun.lower().split()
+            noun = noun.lower().strip().split()
 
             perfect_past = conjugate(verb,
                 tense='past',
@@ -50,7 +52,7 @@ for file_name in file_names:
                 number='singular',
                 mood='indicative',
                 aspect='progressive'
-            )
+            ).strip()
 
             imperative = conjugate(verb, 
                 tense='present',
@@ -58,7 +60,7 @@ for file_name in file_names:
                 number='singular',
                 mood='indicative',
                 aspect='imperfective',
-                negated=False)
+                negated=False).strip()
 
             type_value = convert_const_case(
                 noun +
