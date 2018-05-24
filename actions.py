@@ -4,8 +4,9 @@ import sys
 from pattern.en import conjugate
 
 from templates import (
-    types_file_template,
+    domain_type_template,
     type_template,
+    types_file_template,
     actions_file_template,
     action_template,
     reducer_case_template,
@@ -16,6 +17,7 @@ from utils import (
     convert_camel_case,
     convert_reverse_camel_case,
     convert_const_case,
+    singularize,
     create_folder,
     log_title,
     log_subtitle,
@@ -82,7 +84,8 @@ for file_name in os.listdir(description_folder):
 
             types += type_template.format(
                 type_name=type_name,
-                type_value=type_value)
+                type_value=type_value
+            )
             actions += action_template.format(
                 action_name=action_name,
                 type_name=type_name,
@@ -92,7 +95,12 @@ for file_name in os.listdir(description_folder):
             )
 
     domain = get_filename(file.name)
-    upper_camel_domain = convert_camel_case([domain])
+    singular_domain = singularize(domain)
+    upper_domain = domain.upper()
+    singular_upper_domain = singularize(upper_domain)
+    upper_camel_domain = convert_camel_case(domain.split())
+    singular_upper_camel_domain = singularize(upper_camel_domain)
+    domain_type = domain_type_template.format(domain=singular_upper_domain)
     domain_state_type = '{0}State'.format(upper_camel_domain)
 
     print log("CREATED: {domain} types".format(domain=domain))
@@ -101,9 +109,13 @@ for file_name in os.listdir(description_folder):
     with open(types_file_name, 'w') as types_file:
         types_file.write(
             types_file_template.format(
-                domain=domain.upper(),
+                upper_camel_domain=upper_camel_domain,
+                domain_type=domain_type,
+                domain=upper_domain,
                 types=types,
-                or_type='\n  | '.join(flow_types)))
+                or_type='\n  | '.join(flow_types)
+            )
+        )
 
     print log("CREATED: {domain} actions".format(domain=domain))
     create_folder('output/actions')
@@ -125,6 +137,9 @@ for file_name in os.listdir(description_folder):
         reducers_file.write(
             reducers_file_template.format(
                 domain=domain,
+                domain_type=domain_type,
+                upper_camel_domain=upper_camel_domain,
+                singular_upper_camel_domain=singular_upper_camel_domain,
                 main_type='{0}_ACTION_TYPE'.format(domain.upper()),
                 domain_state_type=domain_state_type,
                 cases=cases
