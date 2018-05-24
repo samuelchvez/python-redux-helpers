@@ -71,11 +71,11 @@ for file_name in os.listdir(description_folder):
 
             type_value = convert_const_case(
                 noun +
-                [perfect_past] +
+                perfect_past.split() +
                 modification)
             type_name = '{0}_TYPE'.format(type_value)
             action_name = convert_reverse_camel_case(
-                [imperative] +
+                imperative.split()[::-1] +
                 noun +
                 modification)
             flow_types.append(type_name)
@@ -131,4 +131,4 @@ for file_name in os.listdir(description_folder):
             ))
 
     print log("SUCCES: {domain}".format(domain=domain), code='okblue')
-print log("SUCCES: process completed", code='okgreen')
+print log("SUCCES: process complete", code='okgreen')

@@ -1,5 +1,5 @@
 type_template = '''export type {type_name} = {{
-  type: '{type_value}';
+  type: '{type_value}',
   payload: undefined
 }};
 export const {type_value} = '{type_value}';
@@ -19,10 +19,10 @@ action_template = '''export const {action_name} = (): {type_name} => ({{
 '''
 
 actions_file_template = '''// @flow
-import * as types from '..types/{domain}';
+import * as types from '../types/{domain}';
 import type {{
 {flow_types}
-}} from '..types/{domain}';
+}} from '../types/{domain}';
 
 {actions}
 '''
@@ -31,7 +31,7 @@ reducer_case_template = '''
   case types.{type_value}: {{
     return state;
   }}
-''';
+'''
 
 reducers_file_template = '''//@flow
 import {{ combineReducers }} from 'redux';
@@ -52,4 +52,4 @@ const {domain} =  (
 }}
 
 export default {domain};
-''';
+'''
