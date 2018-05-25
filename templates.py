@@ -132,7 +132,7 @@ export default {domain};
 
 // Selectors
 export const get{singular_upper_camel_domain} = (state: {domain_state_type}, id: ID_TYPE): ?{domain_type} => state.byId[id];
-export const get{upper_camel_domain} = (state: {domain_state_type}): Array<{domain_type}> => state.order.map(i => get{singular_upper_camel_domain}(state, i));
+export const get{upper_camel_domain} = (state: {domain_state_type}): Array<?{domain_type}> => state.order.map(i => get{singular_upper_camel_domain}(state, i));
 export const is{singular_upper_camel_domain}Fetching = (state: {domain_state_type}, id: ID_TYPE): boolean => state.fetching.includes(id);
 export const isFetching{upper_camel_domain} = (state: {domain_state_type}): boolean => state.isFetching;
 export const get{upper_camel_domain}Error = (state: {domain_state_type}): ERROR_TYPE => state.error;
@@ -140,6 +140,35 @@ export const get{singular_upper_camel_domain}Error = (state: {domain_state_type}
 export const are{upper_camel_domain}Toggled = (state: {domain_state_type}): boolean => state.toggle;
 export const getSelected{singular_upper_camel_domain} = (state: {domain_state_type}): ?{domain_type} => get{singular_upper_camel_domain}(state, state.selected);
 export const get{singular_upper_camel_domain}Counter = (state: {domain_state_type}): number => state.counter;
+
+//////////////////////////////////////////////////////////////
+// TODO: move to index.js
+//////////////////////////////////////////////////////////////
+
+// Imports
+import type {{ {domain_state_type} }} from './{domain}';
+import {domain}, * as from{upper_camel_domain} from './{domain}';
+
+// AppState
+export type AppState = {{
+  {domain}: {domain_state_type}
+}};
+
+// Reducer
+const reducer = combineReducers({{
+  {domain}
+}});
+
+// Bottom
+export const get{singular_upper_camel_domain} = genSelector(from{upper_camel_domain}.get{singular_upper_camel_domain}, '{domain}')
+export const get{upper_camel_domain} = genSelector(from{upper_camel_domain}.get{upper_camel_domain}, '{domain}')
+export const is{singular_upper_camel_domain}Fetching = genSelector(from{upper_camel_domain}.is{singular_upper_camel_domain}Fetching, '{domain}')
+export const isFetching{upper_camel_domain} = genSelector(from{upper_camel_domain}.isFetching{upper_camel_domain}, '{domain}')
+export const get{upper_camel_domain}Error = genSelector(from{upper_camel_domain}.get{upper_camel_domain}Error, '{domain}')
+export const get{singular_upper_camel_domain}Error = genSelector(from{upper_camel_domain}.get{singular_upper_camel_domain}Error, '{domain}')
+export const are{upper_camel_domain}Toggled = genSelector(from{upper_camel_domain}.are{upper_camel_domain}Toggled, '{domain}')
+export const getSelected{singular_upper_camel_domain} = genSelector(from{upper_camel_domain}.getSelected{singular_upper_camel_domain}, '{domain}')
+export const get{singular_upper_camel_domain}Counter = genSelector(from{upper_camel_domain}.get{singular_upper_camel_domain}Counter, '{domain}')
 
 /*
 const {domain} =  (
