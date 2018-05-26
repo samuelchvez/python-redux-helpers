@@ -9,6 +9,8 @@ export const {type_value} = '{type_value}';
 '''
 
 types_file_template = '''// @flow
+import type {{ ID_TYPE, ERROR_TYPE }} from './common';
+
 export type {domain_type} = {{}};
 
 {types}export type {domain}_ACTION_TYPE =
@@ -23,10 +25,14 @@ action_template = '''export const {action_name} = (): {type_name} => ({{
 '''
 
 actions_file_template = '''// @flow
-import * as types from '../types/{domain}';
+import type {{ ID_TYPE, ERROR_TYPE }} from '../types/common';
+
 import type {{
+  {domain_type},
 {flow_types}
 }} from '../types/{domain}';
+import * as types from '../types/{domain}';
+
 
 {actions}
 '''
@@ -60,6 +66,7 @@ export type {domain_state_type} = {{
 const byId = common.byId({{
   added: [],
   updated: [],
+  updatedInBulk: [],
   fetched: [],
   removed: [],
   confirmed: [],
@@ -71,6 +78,7 @@ const byId = common.byId({{
 const order = common.order({{
   added: [],
   fetched: [],
+  replaced: [],
   removed: [],
 }});
 
@@ -160,15 +168,15 @@ const reducer = combineReducers({{
 }});
 
 // Bottom
-export const get{singular_upper_camel_domain} = genSelector(from{upper_camel_domain}.get{singular_upper_camel_domain}, '{domain}')
-export const get{upper_camel_domain} = genSelector(from{upper_camel_domain}.get{upper_camel_domain}, '{domain}')
-export const is{singular_upper_camel_domain}Fetching = genSelector(from{upper_camel_domain}.is{singular_upper_camel_domain}Fetching, '{domain}')
-export const isFetching{upper_camel_domain} = genSelector(from{upper_camel_domain}.isFetching{upper_camel_domain}, '{domain}')
-export const get{upper_camel_domain}Error = genSelector(from{upper_camel_domain}.get{upper_camel_domain}Error, '{domain}')
-export const get{singular_upper_camel_domain}Error = genSelector(from{upper_camel_domain}.get{singular_upper_camel_domain}Error, '{domain}')
-export const are{upper_camel_domain}Toggled = genSelector(from{upper_camel_domain}.are{upper_camel_domain}Toggled, '{domain}')
-export const getSelected{singular_upper_camel_domain} = genSelector(from{upper_camel_domain}.getSelected{singular_upper_camel_domain}, '{domain}')
-export const get{singular_upper_camel_domain}Counter = genSelector(from{upper_camel_domain}.get{singular_upper_camel_domain}Counter, '{domain}')
+export const get{singular_upper_camel_domain} = genSelector(from{upper_camel_domain}.get{singular_upper_camel_domain}, '{domain}');
+export const get{upper_camel_domain} = genSelector(from{upper_camel_domain}.get{upper_camel_domain}, '{domain}');
+export const is{singular_upper_camel_domain}Fetching = genSelector(from{upper_camel_domain}.is{singular_upper_camel_domain}Fetching, '{domain}');
+export const isFetching{upper_camel_domain} = genSelector(from{upper_camel_domain}.isFetching{upper_camel_domain}, '{domain}');
+export const get{upper_camel_domain}Error = genSelector(from{upper_camel_domain}.get{upper_camel_domain}Error, '{domain}');
+export const get{singular_upper_camel_domain}Error = genSelector(from{upper_camel_domain}.get{singular_upper_camel_domain}Error, '{domain}');
+export const are{upper_camel_domain}Toggled = genSelector(from{upper_camel_domain}.are{upper_camel_domain}Toggled, '{domain}');
+export const getSelected{singular_upper_camel_domain} = genSelector(from{upper_camel_domain}.getSelected{singular_upper_camel_domain}, '{domain}');
+export const get{singular_upper_camel_domain}Counter = genSelector(from{upper_camel_domain}.get{singular_upper_camel_domain}Counter, '{domain}');
 
 /*
 const {domain} =  (

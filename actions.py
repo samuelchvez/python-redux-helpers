@@ -124,6 +124,7 @@ for file_name in os.listdir(description_folder):
         actions_file.write(
             actions_file_template.format(
                 domain=domain,
+                domain_type=domain_type,
                 flow_types=',\n'.join([
                     '  {0}'.format(flow_type) for flow_type in flow_types
                 ]),
