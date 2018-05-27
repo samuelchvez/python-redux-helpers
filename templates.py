@@ -72,6 +72,8 @@ const byId = common.byId({{
   confirmed: [],
   addedToArrayAttribute: [],
   removedFromArrayAttribute: [],
+  replacedInArrayAttribute: [],
+  cascade: {{}},
   defaultAttributes: {{}}
 }});
 
