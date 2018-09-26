@@ -2,7 +2,7 @@ domain_type_template = '{domain}_TYPE'
 
 type_template = '''export type {type_name} = {{
   type: '{type_value}',
-  payload: {{}}
+  payload: {{}},
 }};
 export const {type_value} = '{type_value}';
 
@@ -19,7 +19,7 @@ export type {domain_type} = {{}};
 
 action_template = '''export const {action_name} = (): {type_name} => ({{
   type: types.{type_value},
-  payload: {{}}
+  payload: {{}},
 }});
 
 '''
@@ -29,7 +29,7 @@ import type {{ ID_TYPE, ERROR_TYPE }} from '../types/common';
 
 import type {{
   {domain_type},
-{flow_types}
+{flow_types},
 }} from '../types/{domain}';
 import * as types from '../types/{domain}';
 
@@ -60,7 +60,7 @@ export type {domain_state_type} = {{
   errors: {{ [ID_TYPE]: ERROR_TYPE }},
   isToggled: boolean,
   selected: number,
-  counter: number
+  counter: number,
 }};
 
 const byId = common.byId({{
@@ -74,7 +74,7 @@ const byId = common.byId({{
   removedFromArrayAttribute: [],
   replacedInArrayAttribute: [],
   cascade: {{}},
-  defaultAttributes: {{}}
+  defaultAttributes: {{}},
 }});
 
 const order = common.order({{
@@ -88,41 +88,41 @@ const order = common.order({{
 const fetching = common.fetching({{
   started: [],
   succeed: [],
-  failed: []
+  failed: [],
 }});
 
 const isFetching = common.isFetching({{
   started: [],
   succeed: [],
-  failed: []
+  failed: [],
 }});
 
 const error = common.error({{
   clear: [],
-  populate: []
+  populate: [],
 }});
 
 const errors = common.errors({{
   clear: [],
-  populate: []
+  populate: [],
 }});
 
 const isToggled = common.toggle({{
   turnedOn: [],
   turnedOff: [],
-  default: true
+  default: true,
 }});
 
 const selected = common.mux({{
   selected: [],
   allDeselected: [],
-  default: -1
+  default: -1,
 }});
 
 const counter = common.counter({{
   incremented: [],
   decremented: [],
-  reset: []
+  reset: [],
 }});
 
 const {domain} = combineReducers({{
@@ -134,7 +134,7 @@ const {domain} = combineReducers({{
   errors,
   isToggled,
   mux,
-  counter
+  counter,
 }});
 
 
