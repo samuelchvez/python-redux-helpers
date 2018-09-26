@@ -82,6 +82,7 @@ const order = common.order({{
   fetched: [],
   replaced: [],
   removed: [],
+  confirmed: [],
 }});
 
 const fetching = common.fetching({{
