@@ -4,7 +4,7 @@ type_template = '''export const {type_value} = '{type_value}';
 
 '''
 
-types_file_template = ''''''
+types_file_template = '''{types}'''
 
 action_template = '''export const {action_name} = () => ({{
   type: types.{type_value},
