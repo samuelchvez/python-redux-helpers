@@ -1,3 +1,4 @@
+import re
 import os
 from datetime import datetime
 
@@ -6,20 +7,13 @@ def get_filename(path):
     return os.path.splitext(os.path.basename(path))[0]
 
 
-def singularize(noun):
-    if noun[-1] in ['s', 'S']:
-        return noun[:len(noun) - 1]
-
-    return noun
-
-
 def convert_reverse_camel_case(string_list):
     return ''.join([string_list[0]] + [
         part.capitalize()
         for part in string_list[1:]
     ])
 
-def convert_camel_case(string_list, capitalize_first=True):
+def convert_camel_case(string_list, capitalize_first=False):
     if capitalize_first:
         return ''.join([
             part.capitalize()

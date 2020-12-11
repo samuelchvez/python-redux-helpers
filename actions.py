@@ -4,7 +4,7 @@ import sys
 from pattern.en import conjugate
 
 from templates import (
-    domain_type_template,
+    add_type_template,
     type_template,
     types_file_template,
     actions_file_template,
@@ -17,7 +17,6 @@ from utils import (
     convert_camel_case,
     convert_reverse_camel_case,
     convert_const_case,
-    singularize,
     create_folder,
     log_title,
     log_subtitle,
@@ -39,7 +38,54 @@ for file_name in os.listdir(description_folder):
         actions = ''
         cases = ''
         flow_types = []
+        row_count = 0
         for row in file:
+            row_count += 1
+            if row_count == 1:
+                singular_managed_type = row
+                splitted_singular_managed_type = singular_managed_type.split()
+                singular_managed_type_const_cased = convert_const_case(
+                    splitted_singular_managed_type
+                )
+                singular_managed_type_camel_cased = convert_camel_case(
+                    splitted_singular_managed_type
+                )
+                singular_managed_type_upper_camel_cased = convert_camel_case(
+                    splitted_singular_managed_type,
+                    capitalize_first=True
+                )
+                continue
+
+            if row_count == 2:
+                plural_managed_type = row
+                splitted_plural_managed_type = plural_managed_type.split()
+                plural_managed_type_const_cased = convert_const_case(
+                    splitted_plural_managed_type
+                )
+                plural_managed_type_camel_cased = convert_camel_case(
+                    splitted_plural_managed_type
+                )
+                plural_managed_type_upper_camel_cased = convert_camel_case(
+                    splitted_plural_managed_type,
+                    capitalize_first=True,
+                )
+                continue
+
+            if row_count == 3:
+                domain_name = row
+                splitted_domain_name = domain_name.split()
+                domain_name_camel_cased = convert_camel_case(
+                    splitted_domain_name
+                )
+                domain_name_upper_camel_cased = convert_camel_case(
+                    splitted_domain_name,
+                    capitalize_first=True,
+                )
+                domain_name_const_cased = convert_const_case(
+                    splitted_domain_name
+                )
+                continue
+
             splitted_row = row.strip().split(';')
             modification = []
             if len(splitted_row) == 2:
@@ -94,57 +140,66 @@ for file_name in os.listdir(description_folder):
                 type_value=type_value
             )
 
-    domain = get_filename(file.name)
-    singular_domain = singularize(domain)
-    upper_domain = domain.upper()
-    singular_upper_domain = singularize(upper_domain)
-    upper_camel_domain = convert_camel_case(domain.split())
-    singular_upper_camel_domain = singularize(upper_camel_domain)
-    domain_type = domain_type_template.format(domain=singular_upper_domain)
-    domain_state_type = '{0}State'.format(upper_camel_domain)
-
-    print log("CREATED: {domain} types".format(domain=domain))
+    print log("CREATED: {domain_name_camel_cased} types".format(
+        domain_name_camel_cased=domain_name_camel_cased
+    ))
     create_folder('output/types')
-    types_file_name = 'output/types/{domain}.js'.format(domain=domain)
+    types_file_name = 'output/types/{domain_name_camel_cased}.js'.format(
+        domain_name_camel_cased=domain_name_camel_cased
+    )
     with open(types_file_name, 'w') as types_file:
         types_file.write(
             types_file_template.format(
-                upper_camel_domain=upper_camel_domain,
-                domain_type=domain_type,
-                domain=upper_domain,
+                managed_type=singular_managed_type_const_cased,
+                main_action_type_name=domain_name_const_cased,
                 types=types,
                 or_type='\n  | '.join(flow_types)
             )
         )
 
-    print log("CREATED: {domain} actions".format(domain=domain))
+    print log("CREATED: {domain_name_camel_cased} actions".format(
+        domain_name_camel_cased=domain_name_camel_cased
+    ))
     create_folder('output/actions')
-    actions_file_name = 'output/actions/{domain}.js'.format(domain=domain)
+    actions_file_name = 'output/actions/{domain_name_camel_cased}.js'.format(
+        domain_name_camel_cased=domain_name_camel_cased
+    )
     with open(actions_file_name, 'w') as actions_file:
         actions_file.write(
             actions_file_template.format(
-                domain=domain,
-                domain_type=domain_type,
+                types_filename=domain_name_camel_cased,
+                managed_type=singular_managed_type_const_cased,
                 flow_types=',\n'.join([
                     '  {0}'.format(flow_type) for flow_type in flow_types
                 ]),
                 actions=actions
             ))
 
-    print log("CREATED: {domain} reducers".format(domain=domain))
+    print log("CREATED: {domain_name_camel_cased} reducers".format(
+        domain_name_camel_cased=domain_name_camel_cased)
+    )
     create_folder('output/reducers')
-    reducer_file_name = 'output/reducers/{domain}.js'.format(domain=domain)
+    reducer_file_name = 'output/reducers/{domain_name_camel_cased}.js'.format(
+        domain_name_camel_cased=domain_name_camel_cased
+    )
     with open(reducer_file_name, 'w') as reducers_file:
         reducers_file.write(
             reducers_file_template.format(
-                domain=domain,
-                domain_type=domain_type,
-                upper_camel_domain=upper_camel_domain,
-                singular_upper_camel_domain=singular_upper_camel_domain,
-                main_type='{0}_ACTION_TYPE'.format(domain.upper()),
-                domain_state_type=domain_state_type,
+                managed_type=singular_managed_type_const_cased,
+                types_filename=domain_name_camel_cased,
+                domain_state_type='{}State'.format(domain_name_upper_camel_cased),
+                reducer_name=domain_name_camel_cased,
+                reducer_filename=domain_name_camel_cased,
+                singular_managed_type_upper_camel_cased=singular_managed_type_upper_camel_cased,
+                plural_managed_type_upper_camel_cased=plural_managed_type_upper_camel_cased,
+                main_action_type_name=domain_name_const_cased,
                 cases=cases
             ))
 
-    print log("SUCCES: {domain}".format(domain=domain), code='okblue')
+    print log(
+        "SUCCES: {domain_name_camel_cased}".format(
+            domain_name_camel_cased=domain_name_camel_cased
+        ),
+        code='okblue'
+    )
 print log("SUCCES: process complete", code='okgreen')

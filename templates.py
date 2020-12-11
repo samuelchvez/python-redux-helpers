@@ -1,21 +1,40 @@
-type_template = '''export const {type_value} = '{type_value}';
+add_type_template = '{to_type}_TYPE'
+
+type_template = '''export type {type_name} = {{
+  type: '{type_value}',
+  payload: {{}},
+}};
+export const {type_value} = '{type_value}';
 
 '''
 
-types_file_template = ''''''
+types_file_template = '''// @flow
+import type {{ ID_TYPE, ERROR_TYPE }} from './common';
 
-action_template = '''export const {action_name} = () => ({{
+export type {managed_type} = {{}};
+
+{types}export type {main_action_type_name}_ACTION_TYPE =
+  | {or_type};
+'''
+
+action_template = '''export const {action_name} = (): {type_name} => ({{
   type: types.{type_value},
   payload: {{}},
 }});
 
 '''
 
-actions_file_template = '''import * as types from '../types/{domain}';
+actions_file_template = '''// @flow
+import type {{ ID_TYPE, ERROR_TYPE }} from '../types/common';
+
+import type {{
+  {managed_type},
+{flow_types},
+}} from '../types/{types_filename}';
+import * as types from '../types/{types_filename}';
 
 
-{actions}
-'''
+{actions}'''
 
 reducer_case_template = '''
   case types.{type_value}: {{
@@ -23,10 +42,32 @@ reducer_case_template = '''
   }}
 '''
 
-reducers_file_template = '''import {{ combineReducers }} from 'redux';
+reducers_file_template = '''// @flow
+import {{ combineReducers }} from 'redux';
 
+import type {{ ID_TYPE, ERROR_TYPE }} from '../types/common';
+import type {{ {managed_type} }} from '../types/{types_filename}';
+import type {{ SubstateMultiplexerStateType }} from './common/substateMultiplexer';
 import * as common from './common';
-import * as types from '../types/{domain}';
+import * as types from '../types/{types_filename}';
+
+export type {domain_state_type} = {{
+  byId: {{ [ID_TYPE]: {managed_type} }},
+  order: Array<ID_TYPE>,
+  fetching: Array<ID_TYPE>,
+  isFetching: boolean,
+  error: ERROR_TYPE,
+  errors: {{ [ID_TYPE]: ERROR_TYPE }},
+  isToggled: boolean,
+  selected: number,
+  counter: number,
+  substateMultiplexer: SubstateMultiplexerStateType,
+  orderById: {{ [ID_TYPE]: Array<ID_TYPE> }},
+  timestamp: number,
+  nextPage: ?number,
+  keyExtractorById: {{ [ID_TYPE]: mixed }},
+  singleton: Object,
+}};
 
 const byId = common.byId({{
   added: [],
@@ -78,7 +119,7 @@ const isToggled = common.toggle({{
   default: true,
 }});
 
-const selected = common.mux({{
+const selected = common.selected({{
   selected: [],
   allDeselected: [],
   default: -1,
@@ -90,7 +131,51 @@ const counter = common.counter({{
   reset: [],
 }});
 
-const {domain} = combineReducers({{
+const substateMultiplexer = common.substateMultiplexer({{
+  added: [],
+  fetched: [],
+  replaced: [],
+  removed: [],
+  confirmed: [],
+  selected: [],
+  allDeselected: [],
+}});
+
+const orderById = common.orderById({{
+  fetched: [],
+  replaced: [],
+  idKey: 'id',
+}});
+
+const timestamp = common.keyExtractor({{
+  clear: [],
+  set: [],
+  extractionKey: 'timestamp',
+  default: -1,
+}});
+
+const nextPage = common.keyExtractor({{
+  clear: [],
+  set: [],
+  extractionKey: 'nextPage',
+  default: 1,
+}});
+
+const keyExtractorById = common.keyExtractorById({{
+  clear: [],
+  set: [],
+  extractionKey: 'nextPage',
+  idKey: 'id',
+  default: null,
+}});
+
+const singleton = common.singleton({{
+  clear: [],
+  populate: [],
+  update: [],
+}})
+
+const {reducer_name} = combineReducers({{
   byId,
   order,
   fetching,
@@ -98,52 +183,70 @@ const {domain} = combineReducers({{
   error,
   errors,
   isToggled,
-  mux,
+  selected,
   counter,
+  substateMultiplexer,
+  orderById,
+  timestamp,
+  nextPage,
+  keyExtractorById,
+  singleton,
 }});
 
 
-export default {domain};
+export default {reducer_name};
 
 
 // Selectors
-export const get{singular_upper_camel_domain} = (state, id) => state.byId[id];
-export const get{upper_camel_domain} = state => state.order.map(i => get{singular_upper_camel_domain}(state, i));
-export const is{singular_upper_camel_domain}Fetching = (state, id) => state.fetching.includes(id);
-export const isFetching{upper_camel_domain} = state => state.isFetching;
-export const get{upper_camel_domain}Error = state => state.error;
-export const get{singular_upper_camel_domain}Error = (state, id => state.errors[id];
-export const are{upper_camel_domain}Toggled = state => state.toggle;
-export const getSelected{singular_upper_camel_domain} = state => get{singular_upper_camel_domain}(state, state.selected);
-export const get{singular_upper_camel_domain}Counter = state: number => state.counter;
+export const get{singular_managed_type_upper_camel_cased} = (state: {domain_state_type}, id: ID_TYPE): ?{managed_type} => state.byId[id];
+export const get{plural_managed_type_upper_camel_cased} = (state: {domain_state_type}): Array<?{managed_type}> => state.order.map(i => get{singular_managed_type_upper_camel_cased}(state, i));
+export const is{singular_managed_type_upper_camel_cased}Fetching = (state: {domain_state_type}, id: ID_TYPE): boolean => state.fetching.includes(id);
+export const isFetching{plural_managed_type_upper_camel_cased} = (state: {domain_state_type}): boolean => state.isFetching;
+export const get{plural_managed_type_upper_camel_cased}Error = (state: {domain_state_type}): ERROR_TYPE => state.error;
+export const get{singular_managed_type_upper_camel_cased}Error = (state: {domain_state_type}, id: ID_TYPE): ERROR_TYPE => state.errors[id];
+export const are{plural_managed_type_upper_camel_cased}Toggled = (state: {domain_state_type}): boolean => state.toggle;
+export const getSelected{singular_managed_type_upper_camel_cased} = (state: {domain_state_type}): ?{managed_type} => get{singular_managed_type_upper_camel_cased}(state, state.selected);
+export const get{singular_managed_type_upper_camel_cased}Counter = (state: {domain_state_type}): number => state.counter;
+export const getOrderFor = (state: {domain_state_type}, id: ID_TYPE): Array<ID_TYPE>? => state.orderById[id];
+export const getTimestamp = (state: {domain_state_type}): number => state.timestamp;
+export const getNextPage = (state: {domain_state_type}): ?number => state.nextPage;
+export const getKeyExtractionFor = (state: {domain_state_type}, id: ID_TYPE): mixed => state.keyExtractorById[id];
+export const getSingleton = (state: {domain_state_type}): Object => state.singleton;
 
 //////////////////////////////////////////////////////////////
 // TODO: move to index.js
 //////////////////////////////////////////////////////////////
 
 // Imports
-import {domain}, * as from{upper_camel_domain} from './{domain}';
+import type {{ {domain_state_type} }} from './{reducer_filename}';
+import {reducer_name}, * as from{plural_managed_type_upper_camel_cased} from './{reducer_filename}';
+
+// AppState
+export type AppState = {{
+  {reducer_name}: {domain_state_type}
+}};
 
 // Reducer
 const reducer = combineReducers({{
-  {domain}
+  {reducer_name}
 }});
 
 // Bottom
-export const get{singular_upper_camel_domain} = genSelector(from{upper_camel_domain}.get{singular_upper_camel_domain}, '{domain}');
-export const get{upper_camel_domain} = genSelector(from{upper_camel_domain}.get{upper_camel_domain}, '{domain}');
-export const is{singular_upper_camel_domain}Fetching = genSelector(from{upper_camel_domain}.is{singular_upper_camel_domain}Fetching, '{domain}');
-export const isFetching{upper_camel_domain} = genSelector(from{upper_camel_domain}.isFetching{upper_camel_domain}, '{domain}');
-export const get{upper_camel_domain}Error = genSelector(from{upper_camel_domain}.get{upper_camel_domain}Error, '{domain}');
-export const get{singular_upper_camel_domain}Error = genSelector(from{upper_camel_domain}.get{singular_upper_camel_domain}Error, '{domain}');
-export const are{upper_camel_domain}Toggled = genSelector(from{upper_camel_domain}.are{upper_camel_domain}Toggled, '{domain}');
-export const getSelected{singular_upper_camel_domain} = genSelector(from{upper_camel_domain}.getSelected{singular_upper_camel_domain}, '{domain}');
-export const get{singular_upper_camel_domain}Counter = genSelector(from{upper_camel_domain}.get{singular_upper_camel_domain}Counter, '{domain}');
+export const get{singular_managed_type_upper_camel_cased} = genSelector(from{plural_managed_type_upper_camel_cased}.get{singular_managed_type_upper_camel_cased}, '{reducer_name}');
+export const get{plural_managed_type_upper_camel_cased} = genSelector(from{plural_managed_type_upper_camel_cased}.get{plural_managed_type_upper_camel_cased}, '{reducer_name}');
+export const is{singular_managed_type_upper_camel_cased}Fetching = genSelector(from{plural_managed_type_upper_camel_cased}.is{singular_managed_type_upper_camel_cased}Fetching, '{reducer_name}');
+export const isFetching{plural_managed_type_upper_camel_cased} = genSelector(from{plural_managed_type_upper_camel_cased}.isFetching{plural_managed_type_upper_camel_cased}, '{reducer_name}');
+export const get{plural_managed_type_upper_camel_cased}Error = genSelector(from{plural_managed_type_upper_camel_cased}.get{plural_managed_type_upper_camel_cased}Error, '{reducer_name}');
+export const get{singular_managed_type_upper_camel_cased}Error = genSelector(from{plural_managed_type_upper_camel_cased}.get{singular_managed_type_upper_camel_cased}Error, '{reducer_name}');
+export const are{plural_managed_type_upper_camel_cased}Toggled = genSelector(from{plural_managed_type_upper_camel_cased}.are{plural_managed_type_upper_camel_cased}Toggled, '{reducer_name}');
+export const getSelected{singular_managed_type_upper_camel_cased} = genSelector(from{plural_managed_type_upper_camel_cased}.getSelected{singular_managed_type_upper_camel_cased}, '{reducer_name}');
+export const get{singular_managed_type_upper_camel_cased}Counter = genSelector(from{plural_managed_type_upper_camel_cased}.get{singular_managed_type_upper_camel_cased}Counter, '{reducer_name}');
+export const getSingleton = genSelector(from{plural_managed_type_upper_camel_cased}.getSingleton, '{reducer_name}');
 
 /*
-const {domain} =  (
+const {reducer_name} =  (
   state: {domain_state_type} = {{}},
-  action: {main_type}): {domain_state_type} => {{
+  action: {main_action_type_name}): {domain_state_type} => {{
   switch (action.type) {{
     {cases}
     default:
@@ -151,5 +254,4 @@ const {domain} =  (
   }}
 }}
 */
-
 '''
